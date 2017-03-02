@@ -31,6 +31,7 @@ function M.parse(arg)
    ------------- Training options --------------------
    cmd:option('-nEpochs',         0,       'Number of total epochs to run')
    cmd:option('-batchSize',       32,      'mini-batch size (1 = pure stochastic)')
+   cmd:option('-pretrain',         '',      'load pre-trained weights')
    ---------- Optimization options ----------------------
    cmd:option('-LR',              0.1,   'initial learning rate')
    cmd:option('-momentum',        0.9,   'momentum')
