@@ -1,4 +1,4 @@
---  Gabriele 2/13/2017
+--  Gabriele 2/13/2017, commited changes by Hassan on 3/2/2017
 --  Adapted from Facebook:
 --
 --  Copyright (c) 2016, Facebook, Inc.
@@ -19,7 +19,20 @@ require 'cudnn'
 local M = {}
 
 function M.setup(opt)
-   local model
+local model
+local criterion
+   if opt.pretrain ~= '' then
+      print('=> Loading pre-trained model from file: models/' .. opt.pretrain)
+      model = torch.load(opt.pretrain)
+      if opt.task == 'classification' then
+         criterion = nn.CrossEntropyCriterion():cuda()
+      elseif opt.task == 'regression' then
+         criterion = nn.MSECriterion():cuda()
+      else
+         print('Bad task')
+      end
+   else
+
    print('=> Creating model from file: models/' .. opt.model .. '.lua')
    model = require('models/' .. opt.model)(opt)
 
@@ -61,7 +74,7 @@ function M.setup(opt)
       model = dpt:cuda()
    end
 
-   local criterion
+
    if opt.task == 'classification' then
       criterion = nn.CrossEntropyCriterion():cuda()
    elseif opt.task == 'regression' then
@@ -69,7 +82,7 @@ function M.setup(opt)
    else
       print('Bad task')
    end
-
+   end
    return model, criterion
 end
 
@@ -103,3 +116,4 @@ function M.shareGradInput(model)
 end
 
 return M
+
