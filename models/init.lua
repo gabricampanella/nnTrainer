@@ -21,9 +21,16 @@ local M = {}
 function M.setup(opt)
 local model
 local criterion
-   if opt.pretrain ~= '' then
-      print('=> Loading pre-trained model from file: models/' .. opt.pretrain)
-      model = torch.load(opt.pretrain)
+   if opt.finetune ~= '' then
+      print('=> Loading pre-trained model from file: models/' .. opt.finetune)
+      model = torch.load(opt.finetune)
+      print(' => Replacing classifier with ' .. opt.nClasses .. '-way classifier')
+      local orig = model:get(#model.modules)
+      local linear = nn.Linear(orig.weight:size(2), opt.nClasses)
+      linear.bias:zero()
+      model:remove(#model.modules)
+      model:add(linear:type('torch.CudaTensor'))
+
       if opt.task == 'classification' then
          criterion = nn.CrossEntropyCriterion():cuda()
       elseif opt.task == 'regression' then
@@ -32,6 +39,7 @@ local criterion
          print('Bad task')
       end
    else
+
 
    print('=> Creating model from file: models/' .. opt.model .. '.lua')
    model = require('models/' .. opt.model)(opt)
